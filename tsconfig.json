@@ -19,8 +19,11 @@
     "resolveJsonModule": true,
     "checkJs": false
   },
-  "include": ["src/"],
-  "exclude": [
+  "include": [
+    "src/**/*.ts",
+    "src/templates/**/*",
+  ],
+    "exclude": [ 
     "**/__tests__",
     "**/__fixtures__",
     "node_modules",
