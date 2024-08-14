@@ -71,8 +71,16 @@ const modules = {
     resolve: "@medusajs/cache-redis",
     options: {
       redisUrl: REDIS_URL
-    }
+    },
   },
+}
+
+const services = {
+  notification: {
+    resolve: "./src/services/resend-notification",
+    options: {},
+  },
+  // other services
 };
 
 const projectConfig = {

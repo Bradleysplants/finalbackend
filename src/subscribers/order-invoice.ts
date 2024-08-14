@@ -15,20 +15,19 @@ export default async function orderInvoiceHandler({
     "resendNotificationService"
   );
 
-  const { orderId, email } = data;
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
-      // Send the order invoice email
-      await resendNotificationService.sendOrderInvoiceEmail(orderId, email);
-      console.log(`Order invoice email sent successfully for order ID: ${orderId}`);
+      // Use sendNotification to handle sending the invoice email
+      await resendNotificationService.sendNotification("order.invoice_created", { orderId: data.orderId, email: data.email });
+      console.log(`Order invoice email sent successfully for order ID: ${data.orderId}`);
       break; // Exit the loop if successful
     } catch (error) {
       attempts += 1;
-      console.error(`Attempt ${attempts} failed to send order invoice email for order ID: ${orderId}`, error);
+      console.error(`Attempt ${attempts} failed to send order invoice email for order ID: ${data.orderId}`, error);
       if (attempts >= MAX_RETRIES) {
-        console.error(`Failed to send order invoice email after ${MAX_RETRIES} attempts for order ID: ${orderId}`);
+        console.error(`Failed to send order invoice email after ${MAX_RETRIES} attempts for order ID: ${data.orderId}`);
         // Optionally: handle failure, e.g., log to an external system, notify admin, etc.
       }
     }
