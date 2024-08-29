@@ -22,7 +22,9 @@ export default async function orderFulfillmentCreatedHandler({
   while (attempts < MAX_RETRIES) {
     try {
       // Fetch the order information to get the customer ID
-      const order = await orderService.retrieve(data.id);
+      const order = await orderService.retrieve(data.id, {
+        select: ["customer_id"],
+      });
 
       if (data.no_notification) {
         console.log('Notification is disabled for this order.');
@@ -30,7 +32,9 @@ export default async function orderFulfillmentCreatedHandler({
       }
 
       // Use the customer ID from the order to get customer details
-      const customer = await customerService.retrieve(order.customer_id);
+      const customer = await customerService.retrieve(order.customer_id, {
+        select: ["email"],
+      });
       customerEmail = customer.email;
 
       // Send the notification using the customer's email

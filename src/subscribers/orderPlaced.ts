@@ -17,29 +17,38 @@ export default async function orderPlacedHandler({
   const customerService: CustomerService = container.resolve("customerService");
 
   let attempts = 0;
+  let customerEmail = '';
 
   while (attempts < MAX_RETRIES) {
     try {
-      // Fetch the order information to get the customer's email
+      // Fetch the order information to get the customer ID
       const order = await orderService.retrieve(data.id, {
         relations: ["customer"],
       });
-      
+
       if (data.no_notification) {
         console.log('Notification is disabled for this order.');
         return;
       }
 
+      // Use the customer ID from the order to get customer details if not already populated
+      if (!order.customer.email) {
+        const customer = await customerService.retrieve(order.customer_id);
+        customerEmail = customer.email;
+      } else {
+        customerEmail = order.customer.email;
+      }
+
       // Send the notification using the customer's email
       await resendNotificationService.sendNotification("order.placed", {
-        email: order.customer.email,
+        email: customerEmail,
         orderId: data.id,
       });
-      console.log(`Order placed email sent successfully to ${order.customer.email}`);
+      console.log(`Order placed email sent successfully to ${customerEmail}`);
       break; // Exit the loop if successful
     } catch (error) {
       attempts += 1;
-      console.error(`Attempt ${attempts} failed to send order placed email`, error);
+      console.error(`Attempt ${attempts} failed to send order placed email to ${customerEmail}`, error);
       if (attempts >= MAX_RETRIES) {
         console.error(`Failed to send order placed email after ${MAX_RETRIES} attempts`);
       }

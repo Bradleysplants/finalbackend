@@ -15,12 +15,17 @@ export default async function passwordResetHandler({
     "resendNotificationService"
   );
 
+  const resetLink = `https://boujee-botanical.store/password?token=${data.token}`;
+
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
       // Use sendNotification to handle sending the password reset email
-      await resendNotificationService.sendNotification("user.password_reset", { email: data.email, token: data.token });
+      await resendNotificationService.sendNotification("user.password_reset", { 
+        email: data.email, 
+        reset_link: resetLink 
+      });
       console.log(`Password reset email sent successfully to ${data.email}`);
       break; // Exit the loop if successful
     } catch (error) {
@@ -28,7 +33,6 @@ export default async function passwordResetHandler({
       console.error(`Attempt ${attempts} failed to send password reset email to ${data.email}`, error);
       if (attempts >= MAX_RETRIES) {
         console.error(`Failed to send password reset email after ${MAX_RETRIES} attempts to ${data.email}`);
-        // Optionally: handle failure, e.g., log to an external system, notify admin, etc.
       }
     }
   }
