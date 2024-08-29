@@ -30,7 +30,7 @@ export default async function orderShipmentCreatedHandler({
         throw new Error(`Order or customer not found for order ID: ${data.id}`);
       }
 
-      // Use the customer ID from the order to get customer details if not already populated
+      // Use the customer ID from the order to get customer details
       const customer = await customerService.retrieve(order.customer_id);
 
       if (!customer || typeof customer.email !== 'string') {
