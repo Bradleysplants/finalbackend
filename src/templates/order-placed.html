@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F3F4F6;
+      color: #374151;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    h1 {
+      color: #6C78AD;
+    }
+    p {
+      margin-bottom: 16px;
+    }
+    a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #FFC5E1;
+      color: #4D6E92;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Order Confirmation</h1>
+    <p>Hello {{email}},</p>
+    <p>Your order with ID {{order_id}} has been placed successfully!</p>
+    <p>We are processing your order and will update you once it has shipped.</p>
+    <p>Thank you for shopping with us!</p>
+    <p class="footer">This inbox is unmonitored. Please do not reply to this email.</p>
+    <p class="footer"><a href="{{unsubscribeLink}}" style="color: #FFC5E1;">Unsubscribe</a></p>
+  </div>
+</body>
+</html>

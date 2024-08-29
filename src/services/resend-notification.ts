@@ -1,6 +1,6 @@
 import { AbstractNotificationService } from "@medusajs/medusa";
 import { readFileSync } from "fs";
-import { join } from "path";
+import { resolve } from "path";
 import axios from "axios";
 
 class ResendNotificationService extends AbstractNotificationService {
@@ -21,7 +21,7 @@ class ResendNotificationService extends AbstractNotificationService {
   }
 
   protected loadTemplate_(templateName: string): string {
-    const templatePath = join(__dirname, "..", "templates", `${templateName}.html`);
+    const templatePath = resolve(__dirname, "..", "templates", `${templateName}.html`);
     return readFileSync(templatePath, "utf-8");
   }
 
@@ -51,7 +51,7 @@ class ResendNotificationService extends AbstractNotificationService {
   }
 
   async sendNotification(event: string, data: any): Promise<{ to: string; status: string; data: Record<string, unknown>; }> {
-    const { email, subject, htmlContent } = this.prepareNotificationData(event, data);
+    const { email, subject, htmlContent } = await this.prepareNotificationData(event, data);
     await this.sendEmail_(subject, email, htmlContent);
     return {
       to: email,
@@ -70,39 +70,66 @@ class ResendNotificationService extends AbstractNotificationService {
     };
   }
 
-  protected prepareNotificationData(event: string, data: any) {
+  protected async prepareNotificationData(event: string, data: any) {
     let subject = "";
     let htmlContent = "";
-    const email = data.email;
+    let email = "";
+
+    this.logger_.info(`Preparing notification for event: ${event}`);
 
     switch (event) {
       case "order.placed":
         subject = "Order Confirmation";
-        htmlContent = this.loadTemplate_("order-created")
-          .replace("{{order_id}}", data.orderId)
-          .replace("{{unsubscribeLink}}", "https://yourdomain.com/unsubscribe");
+        email = data.email; // Ensure this comes from the data payload
+        htmlContent = this.loadTemplate_("order-placed")
+          .replace("{{order_id}}", data.order_id);
         break;
       case "user.password_reset":
         subject = "Password Reset Request";
-        const resetLink = `https://yourdomain.com/reset-password?token=${encodeURIComponent(data.token)}`;
+        email = data.email;
+        const resetLink = `https://boujee-botanical.store/reset-password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
-          .replace("{{resetLink}}", resetLink)
-          .replace("{{unsubscribeLink}}", "https://yourdomain.com/unsubscribe");
+          .replace("{{resetLink}}", resetLink);
+        break;
+      case "customer.password_reset":
+        subject = "Password Reset Request";
+        email = data.email;
+        const customerResetLink = `https://boujee-botanical.store/reset-password?token=${encodeURIComponent(data.token)}`;
+        htmlContent = this.loadTemplate_("customer-password-reset")
+          .replace("{{email}}", email)
+          .replace("{{resetLink}}", customerResetLink);
         break;
       case "order.shipment_created":
         subject = "Your Order Has Shipped";
+        email = data.email;
         htmlContent = this.loadTemplate_("order-shipped")
-          .replace("{{order_id}}", data.orderId)
-          .replace("{{unsubscribeLink}}", "https://yourdomain.com/unsubscribe");
+          .replace("{{order_id}}", data.order_id);
         break;
-      case "order.invoice_created":
-        subject = "Your Invoice";
-        htmlContent = this.loadTemplate_("order-invoice")
-          .replace("{{order_id}}", data.orderId)
-          .replace("{{unsubscribeLink}}", "https://yourdomain.com/unsubscribe");
+      case "invite.created":
+        subject = "You're Invited!";
+        email = data.email;
+        const inviteLink = `https://boujee-botanical.store/invite?token=${encodeURIComponent(data.token)}`;
+        htmlContent = this.loadTemplate_("invite-created")
+          .replace("{{email}}", email)
+          .replace("{{inviteLink}}", inviteLink);
+        break;
+      case "order.fulfillment_created":
+        subject = "Your Order Has Been Fulfilled";
+        email = data.email;
+        htmlContent = this.loadTemplate_("order-fulfillment")
+          .replace("{{email}}", email)
+          .replace("{{order_id}}", data.order_id);
+        break;
+      case "customer.created":
+        subject = "Welcome to Boujee Botanical Store!";
+        email = data.email;
+        htmlContent = this.loadTemplate_("customer-created")
+          .replace("{{first_name}}", data.first_name)
+          .replace("{{last_name}}", data.last_name);
         break;
       default:
+        this.logger_.error(`Unhandled notification event: ${event}`);
         throw new Error("Unhandled notification event");
     }
 

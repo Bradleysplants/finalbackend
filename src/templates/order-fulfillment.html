@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Fulfillment Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F3F4F6;
+            color: #374151;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        h1 {
+            color: #9CA3AF;
+        }
+        p {
+            margin-bottom: 16px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Fulfillment Notification</h1>
+        <p>Hello {{email}},</p>
+        <p>Your order with ID {{order_id}} has been successfully fulfilled and is on its way!</p>
+        <p>Thank you for shopping with us!</p>
+        <p class="footer">This inbox is unmonitored. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>
