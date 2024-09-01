@@ -82,7 +82,8 @@ class ResendNotificationService extends AbstractNotificationService {
         subject = "Order Confirmation";
         email = data.email; // Ensure this comes from the data payload
         htmlContent = this.loadTemplate_("order-placed")
-          .replace("{{order_id}}", data.order_id);
+          .replace("{{order_id}}", data.order_id)
+          .replace("{{first_name}}", data.first_name);
         break;
       case "user.password_reset":
         subject = "Password Reset Request";
@@ -90,6 +91,7 @@ class ResendNotificationService extends AbstractNotificationService {
         const resetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
+          .replace("{{first_name}}", data.first_name)
           .replace("{{resetLink}}", resetLink);
         break;
       case "customer.password_reset":
@@ -98,13 +100,15 @@ class ResendNotificationService extends AbstractNotificationService {
         const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("customer-password-reset")
           .replace("{{email}}", email)
+          .replace("{{first_name}}", data.first_name)
           .replace("{{resetLink}}", customerResetLink);
         break;
       case "order.shipment_created":
         subject = "Your Order Has Shipped";
         email = data.email;
         htmlContent = this.loadTemplate_("order-shipped")
-          .replace("{{order_id}}", data.order_id);
+          .replace("{{order_id}}", data.order_id)
+          .replace("{{first_name}}", data.first_name);
         break;
       case "invite.created":
         subject = "You're Invited!";
@@ -119,6 +123,7 @@ class ResendNotificationService extends AbstractNotificationService {
         email = data.email;
         htmlContent = this.loadTemplate_("order-fulfillment")
           .replace("{{email}}", email)
+          .replace("{{first_name}}", data.first_name)
           .replace("{{order_id}}", data.order_id);
         break;
       case "customer.created":

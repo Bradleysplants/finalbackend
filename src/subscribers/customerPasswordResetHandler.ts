@@ -13,21 +13,18 @@ export default async function customerPasswordResetHandler({
 }: SubscriberArgs<{ id: string; email: string; first_name: string; last_name: string; token: string }>) {
   const resendService: ResendNotificationService = container.resolve("resendNotificationService");
 
-  // Assuming you have a way to get countryCode, perhaps from an environment variable or configuration
-  const countryCode = process.env.COUNTRY_CODE || 'us'; // Default to 'us' if countryCode is not set
-
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
-      const resetLink = `https://boujee-botanical.store/${countryCode}/password?token=${data.token}`;
+      const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
 
       await resendService.sendNotification("customer.password_reset", { 
         email: data.email, 
         first_name: data.first_name, 
         last_name: data.last_name, 
         token: data.token,
-        resetLink: resetLink
+        customerResetLink: customerResetLink
       });
 
       console.log(`Customer password reset email sent successfully to ${data.email}`);

@@ -15,7 +15,7 @@ export default async function passwordResetHandler({
     "resendNotificationService"
   );
 
-  const resetLink = `https://boujee-botanical.store/password?token=${data.token}`;
+  const resetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
 
   let attempts = 0;
 
