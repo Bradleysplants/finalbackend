@@ -96,7 +96,7 @@ class ResendNotificationService extends AbstractNotificationService {
       case "customer.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const customerResetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/password?token=${encodeURIComponent(data.token)}`;
+        const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("customer-password-reset")
           .replace("{{email}}", email)
           .replace("{{resetLink}}", customerResetLink);
@@ -111,7 +111,7 @@ class ResendNotificationService extends AbstractNotificationService {
       case "invite.created":
         subject = "You're Invited!";
         email = data.email;
-        const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/invite?token=${encodeURIComponent(data.token)}`;
+        const inviteLink = `https://boujee-botanical.store/invite?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("invite-created")
           .replace("{{email}}", email)
           .replace("{{inviteLink}}", inviteLink);

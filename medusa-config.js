@@ -38,6 +38,15 @@ const plugins = [
     },
   },
   {
+    resolve: `medusa-payment-paypal`,
+    options: {
+      sandbox: process.env.PAYPAL_SANDBOX,
+      clientId: process.env.PAYPAL_CLIENT_ID,
+      clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+      authWebhookId: process.env.PAYPAL_AUTH_WEBHOOK_ID,
+    },
+  },
+  {
     resolve: "medusa-file-s3",
     options: {
       s3_url: process.env.S3_URL,
