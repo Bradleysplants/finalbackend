@@ -80,7 +80,7 @@ class ResendNotificationService extends AbstractNotificationService {
     switch (event) {
       case "order.placed":
         subject = "Order Confirmation";
-        email = data.email; // Ensure this comes from the data payload
+        email = data.email; 
         htmlContent = this.loadTemplate_("order-placed")
           .replace("{{order_id}}", data.order_id)
           .replace("{{first_name}}", data.first_name);
@@ -88,19 +88,17 @@ class ResendNotificationService extends AbstractNotificationService {
       case "user.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const resetLink = `https://localhost:8000/password?token=${encodeURIComponent(data.token)}`;
+        const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
-          .replace("{{first_name}}", data.first_name)
-          .replace("{{resetLink}}", resetLink);
+          .replace("{{resetLink}}", userResetLink);
         break;
       case "customer.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
+        const customerResetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("customer-password-reset")
           .replace("{{email}}", email)
-          .replace("{{first_name}}", data.first_name)
           .replace("{{resetLink}}", customerResetLink);
         break;
       case "order.shipment_created":
@@ -113,7 +111,7 @@ class ResendNotificationService extends AbstractNotificationService {
       case "invite.created":
         subject = "You're Invited!";
         email = data.email;
-        const inviteLink = `https://boujee-botanical.store/invite?token=${encodeURIComponent(data.token)}`;
+        const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/invite?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("invite-created")
           .replace("{{email}}", email)
           .replace("{{inviteLink}}", inviteLink);
