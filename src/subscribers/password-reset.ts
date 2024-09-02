@@ -13,6 +13,11 @@ export default async function userPasswordResetHandler({
 }: SubscriberArgs<{ id: string; email: string; first_name: string; last_name: string; token: string }>) {
   const resendService: ResendNotificationService = container.resolve("resendNotificationService");
 
+  if (!data.token) {
+    console.error(`Missing token for user password reset: ${data.email}`);
+    return;
+  }
+
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
@@ -32,10 +37,13 @@ export default async function userPasswordResetHandler({
     } catch (error) {
       attempts += 1;
       console.error(`Attempt ${attempts} failed to send password reset email to ${data.email}`, error);
+
+      // Optional: Add more specific error handling here if needed
+
       if (attempts >= MAX_RETRIES) {
         console.error(`Failed to send password reset email after ${MAX_RETRIES} attempts to ${data.email}`);
       }
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds before retrying
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Optional: Adjust delay if needed
     }
   }
 }
