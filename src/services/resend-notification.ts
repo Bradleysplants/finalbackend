@@ -88,7 +88,7 @@ class ResendNotificationService extends AbstractNotificationService {
       case "user.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const resetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
+        const resetLink = `https://localhost:8000/password?token=${encodeURIComponent(data.token)}`;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
           .replace("{{first_name}}", data.first_name)

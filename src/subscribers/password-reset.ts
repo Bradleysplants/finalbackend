@@ -15,7 +15,18 @@ export default async function passwordResetHandler({
     "resendNotificationService"
   );
 
-  const resetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
+  // Verify that the token is properly generated and passed
+  if (!data.token) {
+    console.error("Token is missing or undefined");
+    return;
+  }
+
+  // Use environment variable for base URL
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://localhost:8000';
+  const resetLink = `${baseUrl}/password?token=${encodeURIComponent(data.token)}`;
+
+  // Log the reset link to verify
+  console.log(`Reset link: ${resetLink}`);
 
   let attempts = 0;
 
