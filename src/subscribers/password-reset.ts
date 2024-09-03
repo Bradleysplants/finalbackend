@@ -22,14 +22,15 @@ export default async function userPasswordResetHandler({
 
   while (attempts < MAX_RETRIES) {
     try {
-      const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(data.token)}`;
+      // Encode the token into Base64
+      const encodedToken = Buffer.from(data.token).toString('base64');
+      const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(encodedToken)}`;
 
       await resendService.sendNotification("user.password_reset", { 
         email: data.email, 
         first_name: data.first_name, 
         last_name: data.last_name, 
-        token: data.token,
-        userResetLink: userResetLink // Ensure the key matches the placeholder in the template
+        userResetLink: userResetLink // Send the encoded link directly
       });
 
       console.log(`User password reset email sent successfully to ${data.email}`);
@@ -37,8 +38,6 @@ export default async function userPasswordResetHandler({
     } catch (error) {
       attempts += 1;
       console.error(`Attempt ${attempts} failed to send password reset email to ${data.email}`, error);
-
-      // Optional: Add more specific error handling here if needed
 
       if (attempts >= MAX_RETRIES) {
         console.error(`Failed to send password reset email after ${MAX_RETRIES} attempts to ${data.email}`);
