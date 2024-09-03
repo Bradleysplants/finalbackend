@@ -3,6 +3,7 @@ import {
   type SubscriberArgs,
 } from "@medusajs/medusa";
 import ResendNotificationService from "../services/resend-notification";
+import { Buffer } from "buffer"; // Import Buffer to handle Base64 encoding
 
 const MAX_RETRIES = 3;
 
@@ -17,7 +18,9 @@ export default async function customerPasswordResetHandler({
 
   while (attempts < MAX_RETRIES) {
     try {
-      const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
+      // Encode the token into Base64
+      const encodedToken = Buffer.from(data.token).toString('base64');
+      const customerResetLink = `https://boujee-botanical.store/password?token=${encodedToken}`;
 
       await resendService.sendNotification("customer.password_reset", { 
         email: data.email, 
