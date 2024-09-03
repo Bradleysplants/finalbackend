@@ -3,7 +3,6 @@ import {
   type SubscriberArgs,
 } from "@medusajs/medusa";
 import ResendNotificationService from "../services/resend-notification";
-import { Buffer } from "buffer"; // Import Buffer to handle Base64 encoding
 
 const MAX_RETRIES = 3;
 

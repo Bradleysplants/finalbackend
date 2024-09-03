@@ -88,19 +88,20 @@ class ResendNotificationService extends AbstractNotificationService {
       case "user.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(data.token)}`;
+        const userResetLink = data.userResetLink;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
           .replace("{{resetLink}}", userResetLink);
         break;
-      case "customer.password_reset":
-        subject = "Password Reset Request";
-        email = data.email;
-        const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
-        htmlContent = this.loadTemplate_("customer-password-reset")
-          .replace("{{email}}", email)
-          .replace("{{resetLink}}", customerResetLink);
-        break;
+        case "customer.password_reset":
+          subject = "Password Reset Request";
+          email = data.email;
+          // Use the encoded token directly from data without re-encoding
+          const customerResetLink = data.customerResetLink;
+          htmlContent = this.loadTemplate_("customer-password-reset")
+            .replace("{{email}}", email)
+            .replace("{{resetLink}}", customerResetLink);
+          break;
       case "order.shipment_created":
         subject = "Your Order Has Shipped";
         email = data.email;
