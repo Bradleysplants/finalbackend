@@ -23,7 +23,6 @@ export default async function customerPasswordResetHandler({
         email: data.email, 
         first_name: data.first_name, 
         last_name: data.last_name, 
-        token: data.token,
         customerResetLink: customerResetLink
       });
 
