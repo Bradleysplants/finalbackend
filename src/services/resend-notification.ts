@@ -88,19 +88,19 @@ class ResendNotificationService extends AbstractNotificationService {
       case "user.password_reset":
         subject = "Password Reset Request";
         email = data.email;
-        const userResetLink = data.userResetLink;
+        const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${data.token}`;
         htmlContent = this.loadTemplate_("password-reset")
           .replace("{{email}}", email)
           .replace("{{resetLink}}", userResetLink);
         break;
-        case "customer.password_reset":
-          subject = "Password Reset Request";
-          email = data.email;
-          const customerResetLink = data.customerResetLink;
-          htmlContent = this.loadTemplate_("customer-password-reset")
-            .replace("{{email}}", email)
-            .replace("{{resetLink}}", customerResetLink);
-          break;
+      case "customer.password_reset":
+        subject = "Password Reset Request";
+        email = data.email;
+        const customerResetLink = `https://boujee-botanical.store/password?token=${data.token}`;
+        htmlContent = this.loadTemplate_("customer-password-reset")
+          .replace("{{email}}", email)
+          .replace("{{resetLink}}", customerResetLink);
+        break;
       case "order.shipment_created":
         subject = "Your Order Has Shipped";
         email = data.email;
@@ -111,7 +111,7 @@ class ResendNotificationService extends AbstractNotificationService {
       case "invite.created":
         subject = "You're Invited!";
         email = data.email;
-        const inviteLink = `https://boujee-botanical.store/invite?token=${encodeURIComponent(data.token)}`;
+        const inviteLink = `https://boujee-botanical.store/invite?token=${data.token}`;
         htmlContent = this.loadTemplate_("invite-created")
           .replace("{{email}}", email)
           .replace("{{inviteLink}}", inviteLink);
