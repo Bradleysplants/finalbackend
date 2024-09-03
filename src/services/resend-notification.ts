@@ -25,7 +25,7 @@ class ResendNotificationService extends AbstractNotificationService {
     return readFileSync(templatePath, "utf-8");
   }
 
-  protected async sendEmail_(subject: string, email: string, htmlContent: string): Promise<void> {
+  protected async sendEmail_(subject: string, email: string, textContent: string): Promise<void> {
     try {
       const response = await axios.post(
         this.resendApiUrl_,
@@ -33,7 +33,7 @@ class ResendNotificationService extends AbstractNotificationService {
           from: "no-reply@boujee-botanical.store",
           to: [email],
           subject: subject,
-          html: htmlContent,
+          text: textContent, // Use 'text' instead of 'html'
         },
         {
           headers: {
@@ -51,8 +51,8 @@ class ResendNotificationService extends AbstractNotificationService {
   }
 
   async sendNotification(event: string, data: any): Promise<{ to: string; status: string; data: Record<string, unknown>; }> {
-    const { email, subject, htmlContent } = await this.prepareNotificationData(event, data);
-    await this.sendEmail_(subject, email, htmlContent);
+    const { email, subject, textContent } = await this.prepareNotificationData(event, data);
+    await this.sendEmail_(subject, email, textContent);
     return {
       to: email,
       status: "success",
@@ -62,7 +62,7 @@ class ResendNotificationService extends AbstractNotificationService {
 
   async resendNotification(notification: any, config: any): Promise<{ to: string; status: string; data: Record<string, unknown>; }> {
     const email = config.to || notification.to;
-    await this.sendEmail_(notification.data.subject, email, notification.data.htmlContent);
+    await this.sendEmail_(notification.data.subject, email, notification.data.textContent);
     return {
       to: email,
       status: "success",
@@ -72,7 +72,7 @@ class ResendNotificationService extends AbstractNotificationService {
 
   protected async prepareNotificationData(event: string, data: any) {
     let subject = "";
-    let htmlContent = "";
+    let textContent = "";
     let email = "";
 
     this.logger_.info(`Preparing notification for event: ${event}`);
@@ -80,63 +80,48 @@ class ResendNotificationService extends AbstractNotificationService {
     switch (event) {
       case "order.placed":
         subject = "Order Confirmation";
-        email = data.email; 
-        htmlContent = this.loadTemplate_("order-placed")
-          .replace("{{order_id}}", data.order_id)
-          .replace("{{first_name}}", data.first_name);
+        email = data.email;
+        textContent = `Dear ${data.first_name},\n\nThank you for your order! Your order ID is ${data.order_id}.\n\nBest regards,\nBoujee Botanical Store`;
         break;
       case "user.password_reset":
         subject = "Password Reset Request";
         email = data.email;
         const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(data.token)}`;
-        htmlContent = this.loadTemplate_("password-reset")
-          .replace("{{email}}", email)
-          .replace("{{resetLink}}", userResetLink);
+        textContent = `Dear ${data.first_name},\n\nYou requested a password reset. Please click the link below to reset your password:\n${userResetLink}\n\nIf you didn't request this, please ignore this email.`;
         break;
       case "customer.password_reset":
         subject = "Password Reset Request";
         email = data.email;
         const customerResetLink = `https://boujee-botanical.store/password?token=${encodeURIComponent(data.token)}`;
-        htmlContent = this.loadTemplate_("customer-password-reset")
-          .replace("{{email}}", email)
-          .replace("{{resetLink}}", customerResetLink);
+        textContent = `Dear ${data.first_name},\n\nYou requested a password reset. Please click the link below to reset your password:\n${customerResetLink}\n\nIf you didn't request this, please ignore this email.`;
         break;
       case "order.shipment_created":
         subject = "Your Order Has Shipped";
         email = data.email;
-        htmlContent = this.loadTemplate_("order-shipped")
-          .replace("{{order_id}}", data.order_id)
-          .replace("{{first_name}}", data.first_name);
+        textContent = `Dear ${data.first_name},\n\nYour order has shipped! Your order ID is ${data.order_id}.\n\nBest regards,\nBoujee Botanical Store`;
         break;
       case "invite.created":
         subject = "You're Invited!";
         email = data.email;
         const inviteLink = `https://boujee-botanical.store/invite?token=${encodeURIComponent(data.token)}`;
-        htmlContent = this.loadTemplate_("invite-created")
-          .replace("{{email}}", email)
-          .replace("{{inviteLink}}", inviteLink);
+        textContent = `Dear ${data.first_name},\n\nYou have been invited to join the Boujee Botanical Store. Please click the link below to accept the invitation:\n${inviteLink}`;
         break;
       case "order.fulfillment_created":
         subject = "Your Order Has Been Fulfilled";
         email = data.email;
-        htmlContent = this.loadTemplate_("order-fulfillment")
-          .replace("{{email}}", email)
-          .replace("{{first_name}}", data.first_name)
-          .replace("{{order_id}}", data.order_id);
+        textContent = `Dear ${data.first_name},\n\nYour order has been fulfilled! Your order ID is ${data.order_id}.\n\nBest regards,\nBoujee Botanical Store`;
         break;
       case "customer.created":
         subject = "Welcome to Boujee Botanical Store!";
         email = data.email;
-        htmlContent = this.loadTemplate_("customer-created")
-          .replace("{{first_name}}", data.first_name)
-          .replace("{{last_name}}", data.last_name);
+        textContent = `Dear ${data.first_name},\n\nWelcome to Boujee Botanical Store! We are glad to have you.\n\nBest regards,\nBoujee Botanical Store`;
         break;
       default:
         this.logger_.error(`Unhandled notification event: ${event}`);
         throw new Error("Unhandled notification event");
     }
 
-    return { email, subject, htmlContent };
+    return { email, subject, textContent };
   }
 }
 
