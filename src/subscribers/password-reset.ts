@@ -22,7 +22,7 @@ export default async function passwordResetHandler({
 
   while (attempts < MAX_RETRIES) {
     try {
-      const userResetLink = `https://boujee-botanical.store/admin/password-reset?token=${encodeURIComponent(data.token)}`;
+      const userResetLink = `https://boujee-botanical.store/admin/user-password-reset?token=${encodeURIComponent(data.token)}`;
 
       await resendService.sendNotification("user.password_reset", { 
         email: data.email, 
