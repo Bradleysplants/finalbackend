@@ -17,8 +17,8 @@ export default async function customerPasswordResetHandler({
 
   while (attempts < MAX_RETRIES) {
     try {
-      // Encode the token into Base64
-      const encodedToken = Buffer.from(data.token).toString('base64');
+      // Encode the token into Base64 and ensure it is safe for URL inclusion
+      const encodedToken = encodeURIComponent(Buffer.from(data.token).toString('base64'));
       const customerResetLink = `https://boujee-botanical.store/password?token=${encodedToken}`;
 
       await resendService.sendNotification("customer.password_reset", { 
