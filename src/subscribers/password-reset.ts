@@ -6,7 +6,7 @@ import ResendNotificationService from "../services/resend-notification";
 
 const MAX_RETRIES = 3;
 
-export default async function userPasswordResetHandler({
+export default async function passwordResetHandler({
   data,
   eventName,
   container,
@@ -22,15 +22,13 @@ export default async function userPasswordResetHandler({
 
   while (attempts < MAX_RETRIES) {
     try {
-      // Encode the token into Base64
-      const encodedToken = Buffer.from(data.token).toString('base64');
-      const userResetLink = `https://boujee-botanical.store/password/user-password-reset?token=${encodeURIComponent(encodedToken)}`;
+      const userResetLink = `https://boujee-botanical.store/admin/password-reset?token=${encodeURIComponent(data.token)}`;
 
       await resendService.sendNotification("user.password_reset", { 
         email: data.email, 
         first_name: data.first_name, 
         last_name: data.last_name, 
-        userResetLink: userResetLink // Send the encoded link directly
+        userResetLink: userResetLink // Ensure the key matches the placeholder in the template
       });
 
       console.log(`User password reset email sent successfully to ${data.email}`);
@@ -42,7 +40,7 @@ export default async function userPasswordResetHandler({
       if (attempts >= MAX_RETRIES) {
         console.error(`Failed to send password reset email after ${MAX_RETRIES} attempts to ${data.email}`);
       }
-      await new Promise(resolve => setTimeout(resolve, 5000)); // Optional: Adjust delay if needed
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Adjust delay if needed
     }
   }
 }
@@ -50,6 +48,6 @@ export default async function userPasswordResetHandler({
 export const config: SubscriberConfig = {
   event: "user.password_reset",
   context: {
-    subscriberId: "user-password-reset-handler",
+    subscriberId: "password-reset-handler",
   },
 };

@@ -96,7 +96,6 @@ class ResendNotificationService extends AbstractNotificationService {
         case "customer.password_reset":
           subject = "Password Reset Request";
           email = data.email;
-          // Use the encoded token directly from data without re-encoding
           const customerResetLink = data.customerResetLink;
           htmlContent = this.loadTemplate_("customer-password-reset")
             .replace("{{email}}", email)
