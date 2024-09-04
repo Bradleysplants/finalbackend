@@ -19,7 +19,7 @@ export default async function userPasswordResetHandler({
     try {
       const userResetLink = `https://boujee-botanical.store/user-password-reset?token=${encodeURIComponent(data.token)}`;
 
-      await resendService.sendNotification("customer.password_reset", { 
+      await resendService.sendNotification("user.password_reset", { 
         email: data.email, 
         first_name: data.first_name, 
         last_name: data.last_name, 
