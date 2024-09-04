@@ -6,9 +6,9 @@ import ResendNotificationService from "../services/resend-notification";
 
 const MAX_RETRIES = 3;
 
-export default async function customerPasswordResetHandler({
+export default async function userPasswordResetHandler({
   data,
-  eventName,
+  eventName, 
   container,
 }: SubscriberArgs<{ id: string; email: string; first_name: string; last_name: string; token: string }>) {
   const resendService: ResendNotificationService = container.resolve("resendNotificationService");
