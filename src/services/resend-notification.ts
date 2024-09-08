@@ -106,7 +106,8 @@ class ResendNotificationService extends AbstractNotificationService {
         email = data.email;
         htmlContent = this.loadTemplate_("order-shipped")
           .replace("{{order_id}}", data.order_id)
-          .replace("{{first_name}}", data.first_name);
+          .replace("{{first_name}}", data.first_name)
+          .replace("{{tracking_number}}", data.tracking_number);
         break;
       case "invite.created":
         subject = "You're Invited!";

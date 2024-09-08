@@ -3,64 +3,41 @@ import {
   type SubscriberArgs,
 } from "@medusajs/medusa";
 import ResendNotificationService from "../services/resend-notification";
-import { CustomerService, OrderService } from "@medusajs/medusa";
 
 const MAX_RETRIES = 3;
 
 export default async function orderShipmentCreatedHandler({
   data,
-  eventName,
+  eventName, 
   container,
-}: SubscriberArgs<{ id: string; fulfillment_id: string; no_notification: boolean }>) {
-  const resendNotificationService: ResendNotificationService = container.resolve("resendNotificationService");
-  const orderService: OrderService = container.resolve("orderService");
-  const customerService: CustomerService = container.resolve("customerService");
+}: SubscriberArgs<{ order_id: string; email: string; }>) {
+  const resendService: ResendNotificationService = container.resolve("resendNotificationService");
+  const orderService = container.resolve("orderService");
+  const customerService = container.resolve("customerService");
 
-  let attempts = 0;
-  let customerEmail = '';
+  try {
+    // Fetch order information (if needed)
+    const order = await orderService.retrieve(data.order_id, { relations: ["customer"] });
+    
+    // Fetch customer information from CustomerService
+    const customer = await customerService.retrieve(order.customer_id);
 
-  while (attempts < MAX_RETRIES) {
-    try {
-      // Fetch the order information to get the customer ID
-      const order = await orderService.retrieve(data.id, {
-        relations: ["customer"],
-      });
+    // Extract customer first name
+    const firstName = customer.first_name;
 
-      if (!order || !order.customer_id) {
-        throw new Error(`Order or customer not found for order ID: ${data.id}`);
-      }
+    const orderShipmentLink = `https://boujee-botanical.store/account/orders/${data.order_id}`;
 
-      // Use the customer ID from the order to get customer details
-      const customer = await customerService.retrieve(order.customer_id);
+    // Send the email with the first name and order shipment details
+    await resendService.sendNotification("order.shipment_created", { 
+      email: data.email, 
+      first_name: firstName, 
+      order_id: data.order_id, 
+      orderShipmentLink: orderShipmentLink
+    });
 
-      if (!customer || typeof customer.email !== 'string') {
-        throw new Error(`Customer not found or missing email for customer ID: ${order.customer_id}`);
-      }
-
-      customerEmail = customer.email;
-
-      if (data.no_notification) {
-        console.log('Notification is disabled for this order.');
-        return;
-      }
-
-      // Use sendNotification to handle sending the order shipment email
-      await resendNotificationService.sendNotification("order.shipment_created", {
-        email: customerEmail,
-        order_id: data.id,
-        fulfillment_id: data.fulfillment_id, // Include the fulfillment ID if needed in the email template
-      });
-
-      console.log(`Order shipment email sent successfully to ${customerEmail}`);
-      break; // Exit the loop if successful
-    } catch (error) {
-      attempts += 1;
-      console.error(`Attempt ${attempts} failed to send order shipment email to ${customerEmail || 'unknown email'}`, error);
-      if (attempts >= MAX_RETRIES) {
-        console.error(`Failed to send order shipment email after ${MAX_RETRIES} attempts`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds before retrying
-    }
+    console.log(`Shipment email sent successfully to ${data.email}`);
+  } catch (error) {
+    console.error(`Failed to send shipment email to ${data.email}`, error);
   }
 }
 

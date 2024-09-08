@@ -9,7 +9,10 @@
   <div style="max-width: 600px; margin: 40px auto; background-color: #6C78AD; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
     <h2 style="color: #FFC5E1;">Your Order Has Shipped</h2>
     <p>Hello {{first_name}},</p>
-    <p>Your order with ID {{order_id}} has shipped. You can track your order using the tracking number provided in your account.</p>
+    <p>Your order with ID {{order_id}} has shipped. You can track your order using the tracking number below:</p>
+    <p><strong>Tracking Number:</strong> {{tracking_number}}</p>
+    <p>You can also track your order on <a href="https://boujee-botanical.store/account/orders/{{order_id}}" style="color: #FFC5E1; text-decoration: none;">boujee-botanical.store</a>.</p>
+    <p>If you have any questions, feel free to reach out to us via our customer support.</p>
     <p>Thanks,</p>
     <p>The Boujee Botanical Store Team</p>
     <footer style="margin-top: 20px; color: #FFF;">
