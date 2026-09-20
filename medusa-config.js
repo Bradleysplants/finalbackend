@@ -69,20 +69,24 @@ const plugins = [
   },
 ];
 
-const modules = {
-  eventBus: {
-    resolve: "@medusajs/event-bus-redis",
-    options: {
-      redisUrl: REDIS_URL
+// Redis is optional locally: without REDIS_URL Medusa falls back to its
+// in-memory event bus and cache. Set REDIS_URL for production / multi-instance.
+const modules = REDIS_URL
+  ? {
+      eventBus: {
+        resolve: "@medusajs/event-bus-redis",
+        options: {
+          redisUrl: REDIS_URL,
+        },
+      },
+      cacheService: {
+        resolve: "@medusajs/cache-redis",
+        options: {
+          redisUrl: REDIS_URL,
+        },
+      },
     }
-  },
-  cacheService: {
-    resolve: "@medusajs/cache-redis",
-    options: {
-      redisUrl: REDIS_URL
-    },
-  },
-}
+  : {};
 
 const services = {
   notification: {
