@@ -32,6 +32,37 @@
   </a>
 </p>
 
+## Run locally
+
+Requirements: Node.js 20 (`nvm use`; the repo supports `>=18 <25`, Node 25+ is **not** supported because the `SlowBuffer` API used by the `buffer-equal-constant-time` dependency (via `jsonwebtoken`) was removed) and PostgreSQL 14+. Redis is optional.
+
+```shell
+nvm use
+npm ci                          # installs exactly what package-lock.json pins
+cp .env.example .env            # then edit DATABASE_URL, secrets, RESEND_API_KEY
+createdb medusaone              # or point DATABASE_URL at any empty database
+npm run build                   # compiles the server and builds the admin UI
+npx medusa migrations run       # creates / updates the schema
+npm run seed                    # optional: demo data from data/seed.json
+npx medusa start                # http://localhost:9000
+```
+
+Check it is up:
+
+```shell
+curl http://localhost:9000/health        # OK
+curl http://localhost:9000/store/regions # JSON
+```
+
+Other scripts: `npm run dev` (watch mode with admin dev server), `npm run typecheck`, `npm test` (no tests exist yet).
+The admin UI is served at `/app`; create a user with `npx medusa user -e you@example.com -p <password>`.
+
+Notes:
+
+- `RESEND_API_KEY` must be non-empty or the server refuses to boot (see `src/services/resend-notification.ts`).
+- Without `REDIS_URL` Medusa uses an in-memory event bus and cache and scheduled jobs are disabled. Set `REDIS_URL` in production.
+- Configuration is read from `.env` (or `.env.production` / `.env.staging` / `.env.test` depending on `NODE_ENV`).
+
 ## Compatibility
 
 This starter is compatible with versions >= 1.8.0 of `@medusajs/medusa`. 
