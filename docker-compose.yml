@@ -3,6 +3,11 @@
 # defaults, so `docker compose up -d db` + the README's `npm run build` /
 # `npx medusa migrations run` / `npx medusa start` flow works out of the box.
 #   docker compose up -d db
+#
+# `name:` is pinned so the data volume below is always called
+# finalbackend_pgdata, regardless of what directory this file is checked out
+# into (Compose otherwise names volumes after the current directory).
+name: finalbackend
 services:
   db:
     image: postgres:16
