@@ -36,11 +36,14 @@
 
 Requirements: Node.js 20 (`nvm use`; the repo supports `>=18 <25`, Node 25+ is **not** supported because the `SlowBuffer` API used by the `buffer-equal-constant-time` dependency (via `jsonwebtoken`) was removed) and PostgreSQL 14+. Redis is optional.
 
+This repo has no bundled Postgres of its own upstream, so a minimal `docker-compose.yml` is included here for local Postgres; its defaults match `DATABASE_URL` in `.env.example` exactly (db `medusaone`, user/password `postgres`/`postgres`, port 5434 — not 5432, to avoid clashing with any host-level Postgres already using that port).
+
 ```shell
 nvm use
 npm ci                          # installs exactly what package-lock.json pins
 cp .env.example .env            # then edit DATABASE_URL, secrets, RESEND_API_KEY
-createdb medusaone              # or point DATABASE_URL at any empty database
+docker compose up -d db         # local Postgres matching .env.example's DATABASE_URL
+                                 # (or: createdb medusaone / point DATABASE_URL at any empty database)
 npm run build                   # compiles the server and builds the admin UI
 npx medusa migrations run       # creates / updates the schema
 npm run seed                    # optional: demo data from data/seed.json
