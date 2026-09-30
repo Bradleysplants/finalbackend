@@ -1,0 +1,31 @@
+# Local PostgreSQL for the Medusa backend. This project has no bundled DB
+# service upstream; DATABASE_URL in .env.example points at this container's
+# defaults, so `docker compose up -d db` + the README's `npm run build` /
+# `npx medusa migrations run` / `npx medusa start` flow works out of the box.
+#   docker compose up -d db
+#
+# `name:` is pinned so the data volume below is always called
+# finalbackend_pgdata, regardless of what directory this file is checked out
+# into (Compose otherwise names volumes after the current directory).
+name: finalbackend
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-medusaone}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      # 5434 by default, not 5432: avoids clashing with any host-level
+      # Postgres already listening on 5432 (e.g. Homebrew's postgresql service).
+      - "127.0.0.1:${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
